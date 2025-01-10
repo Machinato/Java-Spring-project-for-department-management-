@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Departments</title>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="logo">Company Management</h1>
+        <nav class="nav-bar">
+            <a href="/departments" class="nav-link">All Departments</a>
+            <a href="/workers" class="nav-link">All Workers</a>
+            <a href="/send-report" class="nav-link">Get report</a>
+            <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/users}" method="GET"> <button accesskey="d"> All users </button></form>
+            <form th:action="@{/logout}" method="POST"> <button accesskey="d"> LOGOUT </button></form>
+        </nav>
+    </div>
+</header>
+
+<table >
+    <tr>
+        <td>
+            <p>
+                <button id="nameDep_sort" name="nameDep_sort" onclick="sort(0)"><b>Sort by name</b></button>
+            </p>
+            <p>
+                <button id="nameSDep_sort" name="nameSDep_sort" onclick="sort(1)"><b>Sort by short name</b></button>
+            </p>
+            <p>
+                <button id="code_sort" name="code_sort" onclick="sort(2)"><b>Sort by code</b></button>
+            </p>
+        </td>
+        <td style="border: #000000;color: black;">
+            <p><input type="number" placeholder="Phone number" id="phone_number"/></p>
+            <button onclick="searchPhoneNumber()"><b>Filter by phone number</b></button>
+
+            <p><input type="text" placeholder="Name" id="name_filter"/></p>
+            <button onclick="searchByName()"><b>Filter by name</b></button>
+            <p></p>
+            <button onclick="resetFilters()">Reset Filters</button>
+        </td>
+
+        <td >
+            <p>
+                <b><label for="email_filter"> Filter by email </label></b>
+                <select id="email_filter" name="email_filter" onchange="filterByEmail()">
+                    <option value="all">all</option>
+                    <option value="gmail">gmail</option>
+                    <option value="meta">meta</option>
+                </select>
+            </p>
+
+            <p>
+                <b><label for="active_filter">Filter by activity</label></b>
+                <select id="active_filter" name="active_filter" onchange="filterByActive()">
+                    <option value="active" selected>Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="all">All</option>
+                </select>
+            </p>
+        </td>
+    </tr>
+</table>
+
+<form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/department/new}" method="GET">
+    <input type="submit" value="NEW DEPARTMENT">
+</form>
+
+<table style="border:1px solid black; border-collapse: collapse" id="department-table">
+    <tr>
+        <th>Department name</th>
+        <th>Short name</th>
+        <th>Code</th>
+        <th>Email</th>
+        <th>Phone number</th>
+        <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}"></th>
+        <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}"></th>
+        <th></th>
+    </tr>
+    <th:block th:each="dep : ${listDepartments}">
+        <tr th:classappend="${!dep.active} ? 'inactive' : ''">
+            <td th:text="${dep.nameDep}"></td>
+            <td th:text="${dep.nameSDep}"></td>
+            <td th:text="${dep.codeDep}"></td>
+            <td th:text="${dep.emailHead}"></td>
+            <td th:text="${dep.phoneHead}"></td>
+            <td>
+                <form th:action="@{/workers/{dep_id} (dep_id=${dep.id})}" method="GET">
+<!--                    <input type="hidden" name="id_dep" th:value="${dep.id}"/>-->
+                    <input type="submit" value="WORKERS"/>
+                </form>
+            </td>
+            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <form th:action="@{/department/edit/{id} (id=${dep.id})}" method="GET">
+                    <input type="hidden" name="id_dep" th:value="${dep.id}"/>
+                    <input type="submit" value="UPDATE"/>
+                </form>
+            </td>
+            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <form th:action="@{/delete/{id_dep}(id_dep=${dep.id})}" method="GET">
+                <input type="hidden" name="id_dep" th:value="${dep.id}"/>
+                    <input type="submit" value="DELETE" onclick="return confirmation()"/>
+                </form>
+            </td>
+        </tr>
+    </th:block>
+</table>
+</body>
+
+<script type="text/javascript">
+    let sorASC = true;
+    let lastIndex = 0;
+
+    function confirmation() {
+        return confirm('Are sure what you want to delete this data?');
+    }
+
+    function sort(colIndex){
+        if (!sorASC && lastIndex === colIndex){
+            sortTableValueDec(colIndex);
+            sorASC = true;
+            lastIndex = colIndex;
+        }
+        else if(sorASC || (!sorASC && lastIndex !== colIndex)){
+            sortTableByIndex(colIndex);
+            sorASC = false;
+            lastIndex = colIndex
+        }
+    }
+
+    function sortTableByIndex(colIndex){
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("department-table");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[colIndex];
+                y = rows[i + 1].getElementsByTagName("TD")[colIndex];
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function sortTableValueDec(colIndex){
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("department-table");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[colIndex];
+                y = rows[i + 1].getElementsByTagName("TD")[colIndex];
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function filterByEmail(){
+        const filterValue = document.getElementById("email_filter").value;
+        let depRows = document.querySelectorAll("tr");
+        depRows.forEach(function(row) {
+            let email = row.querySelector("td:nth-child(4)");
+            if (email) {
+                const emailText = email.textContent || email.innerText;
+                row.style.display = (filterValue === 'all' || emailText.includes(filterValue)) ? '' : 'none';
+            }
+        });
+    }
+
+    function searchPhoneNumber() {
+        const filterValue = document.getElementById("phone_number").value.trim().replace(/\D/g, ""); // Залишаємо лише цифри
+        let depRows = document.querySelectorAll("tr");
+        depRows.forEach(function(row) {
+            let phoneNumber = row.querySelector("td:nth-child(5)"); // 5-й стовпець для номера телефону
+            if (phoneNumber) {
+                const phoneText = phoneNumber.textContent || phoneNumber.innerText;
+                const normalizedPhone = phoneText.replace(/\D/g, ""); // Видаляємо всі символи, крім цифр
+                row.style.display = normalizedPhone.includes(filterValue) ? '' : 'none';
+            }
+        });
+    }
+
+
+    function searchByName() {
+        const nameFilter = document.getElementById("name_filter").value.toLowerCase();
+        const rows = document.querySelectorAll("#department-table tr");
+
+        rows.forEach(function(row, index) {
+            if (index === 0) return; // Пропускаємо заголовок таблиці
+            const nameCell = row.querySelector("td:nth-child(1)");
+            if (nameCell) {
+                const nameText = nameCell.textContent || nameCell.innerText;
+                row.style.display = nameText.toLowerCase().includes(nameFilter) ? '' : 'none';
+            }
+        });
+    }
+
+    function resetFilters() {
+        let depRows = document.querySelectorAll("tr");
+        depRows.forEach(function(row) {
+            row.style.display = '';
+        });
+        document.getElementById("phone_number").value = '';
+        document.getElementById("name_filter").value = '';
+        document.getElementById("email_filter").value = 'all';
+    }
+
+    function filterByActive() {
+        const filterValue = document.getElementById("active_filter").value;
+        const rows = document.querySelectorAll("#department-table tr");
+
+        rows.forEach(function(row, index) {
+            if (index === 0) return; // Пропускаємо заголовок таблиці
+            const isInactive = row.classList.contains("inactive");
+
+            if (filterValue === "active") {
+                row.style.display = isInactive ? "none" : "";
+            } else if (filterValue === "inactive") {
+                row.style.display = isInactive ? "" : "none";
+            } else {
+                row.style.display = ""; // Показуємо всі
+            }
+        });
+    }
+
+</script>
+</html>

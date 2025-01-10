@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${worker != null ? 'Edit Worker' : 'Add Worker'}"></title>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="logo">Company Management</h1>
+        <nav class="nav-bar">
+            <a href="/departments" class="nav-link">All Departments</a>
+            <a href="/workers" class="nav-link">All Workers</a>
+            <a href="/send-report" class="nav-link">Get report</a>
+            <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/users}" method="GET"> <button accesskey="d"> All users </button></form>
+            <form th:action="@{/logout}" method="POST"> <button accesskey="d"> LOGOUT </button></form>
+        </nav>
+    </div>
+</header>
+<h1 th:text="${worker != null ? 'Edit Worker' : 'Add Worker'}"></h1>
+
+<form th:action="@{${(worker != null && worker.id != null) ? '/worker/update/' + worker.id : '/worker/new'}}" method="POST">
+
+<!--    <div>-->
+<!--        <label for="id">id:</label>-->
+<!--        <input type="text" id="id" name="id" th:value="${worker != null ? worker.id : ''}" required>-->
+<!--    </div>-->
+    <div th:if="${#strings.length(errMessage) > 0}">
+        <p style="color: red"><b th:text="${errMessage}"></b></p>
+    </div>
+    <div>
+        <label for="code">Code:</label>
+        <input type="text" id="code" name="code" th:value="${worker != null ? worker.code : ''}" required>
+    </div>
+    <div>
+        <label for="nameFirst">First Name:</label>
+        <input type="text" id="nameFirst" name="nameFirst" th:value="${worker != null ? worker.nameFirst : ''}" required>
+    </div>
+    <div>
+        <label for="nameSecond">Last Name:</label>
+        <input type="text" id="nameSecond" name="nameSecond" th:value="${worker != null ? worker.nameSecond : ''}" required>
+    </div>
+    <div>
+        <label for="startWork">Start Work Date:</label>
+        <input type="date" id="startWork" name="startWork" th:value="${worker != null ? worker.startWork : ''}" readonly>
+    </div>
+    <div>
+        <label for="endWork">End Work Date:</label>
+        <input type="date" id="endWork" name="endWork" th:value="${worker != null ? worker.endWork : ''}" >
+    </div>
+
+    <!--    <div>-->
+<!--        <label for="email">Email:</label>-->
+<!--        <input type="email" id="email" name="email" th:value="${worker != null ? worker.email : ''}" required>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="phone">Phone:</label>-->
+<!--        <input type="text" id="phone" name="phone" th:value="${worker != null ? worker.phone : ''}" required>-->
+<!--    </div>-->
+    <div>
+        <label for="department">Department:</label>
+        <select id="department" name="department" required>
+            <option th:each="dep : ${departments}"
+                    th:value="${dep.id}"
+                    th:text="${dep.nameDep} + (${dep.nameSDep})"
+                    th:selected="${worker != null && worker.department.id == dep.id}"></option>
+        </select>
+    </div>
+    <div>
+        <button type="submit" th:text="${worker != null ? 'Save Changes' : 'Add Worker'}"></button>
+    </div>
+</form>
+
+<br>
+<a href="/workers">Back to Worker List</a>
+</body>
+</html>

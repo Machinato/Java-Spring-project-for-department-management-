@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration</title>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="login">
+    <h1>Registration:</h1>
+
+    <form th:action="@{/registration}" th:object="${user}" method="post">
+        <label>Username:</label>
+        <input type="text" th:field="*{username}" required />
+        <br>
+        <label>Password:</label>
+        <input type="password" th:field="*{password}" required minlength="8" />
+        <small>Пароль має бути не менше 8 символів</small>
+        <br>
+        <label>Confirm password:</label>
+        <input type="password" name="confirmPassword" required minlength="8" />
+        <label>Email address:</label>
+        <input type="email" name="email"/>
+        <br>
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        <div th:if="${passwordMismatch}" style="color: red;">Паролі не співпадають</div>
+        <button type="submit">Registration</button>
+    </form>
+</div>
+</body>
+</html>

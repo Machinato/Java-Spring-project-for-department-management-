@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Spring24 - CRUD error</title>
+    <!--    https://for-each.dev/lessons/b/-spring-thymeleaf-css-js-->
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="logo">Company Management</h1>
+        <nav class="nav-bar">
+            <a href="/departments" class="nav-link">All Departments</a>
+            <a href="/workers" class="nav-link">All Workers</a>
+            <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/users}" method="GET"> <button accesskey="d"> All users </button></form>
+            <form th:action="@{/logout}" method="POST"> <button accesskey="d"> LOGOUT </button></form>
+        </nav>
+    </div>
+</header>
+<div class="content">
+    <div class="centered">
+        <h1>CRUD ERROR</h1>
+        <br>
+        <br>
+        <h2 th:utext="${error_crud_message}"></h2>
+        <br>
+        <br>
+        <br>
+        <a class="label" th:href="${ret_page}"> RETURN </a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+/* Основной стиль для страницы */
+body {
+    font-family: 'Roboto', Arial, sans-serif; /* Используем современный шрифт */
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5; /* Светлый фон для всей страницы */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Центрирование всей страницы */
+    flex-direction: column;
+}
+
+/* Стили для заголовка */
+.main-header {
+    background-color: #4CAF50; /* Цвет фона заголовка */
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Контейнер редактирования */
+.edit-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+}
+
+/* Дополнительные декоративные элементы */
+.edit-container h1::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 4px;
+    background-color: #4CAF50;
+    margin: 10px auto 20px auto;
+    border-radius: 2px;
+}
+
+/* Логотип */
+.logo {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 0;
+    color: white;
+}
+
+/* Ссылки в навигации */
+.nav-link {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 5px;
+    /*border: 3px;*/
+    /*border-color: black;*/
+    background-color: #29472b;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Эффект наведения */
+.nav-link:hover {
+    background-color: #388E3C; /* Более тёмный цвет при наведении */
+    color: #fff;
+}
+
+/* Навигационная панель */
+.nav-bar {
+    width: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+
+/* Контейнер для выравнивания контента */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+/* Стили для заголовков и текста */
+h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Стили для текста и меток */
+p, label {
+    color: #555;
+    font-size: 1em;
+    margin: 10px;
+    display: block;
+    text-align: left;
+}
+
+/* Ссылка для добавления нового департамента */
+a {
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #388E3C;
+}
+
+/* Стиль для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Стиль для ячеек с фильтрами */
+table td {
+    vertical-align: top;
+}
+
+/* Кнопки */
+button, input[type="submit"], input[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+    background-color: #388E3C;
+    transform: translateY(-2px);
+}
+
+/* Поля ввода */
+input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="password"], select {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="password"]:focus, select:focus {
+    border-color: #4CAF50; /* Цвет фокуса */
+}
+
+
+.loginInput{
+    width: 60%;
+    padding: 8px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Стили для input с placeholder */
+input[type="text"]::placeholder,
+input[type="number"]::placeholder,
+input[type="email"]::placeholder,
+input[type="tel"]::placeholder {
+    color: #aaa;
+}
+
+/* Поле select */
+select {
+    background-color: #fff;
+}
+
+/* Стили для сообщений об ошибках */
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+.login {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 50%;
+    margin: auto;
+}
+
+/* Сообщение об удалении и формы в одной строке */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.caption h1 {
+    font-size: 1.5em;
+    color: #333;
+}
+
+.inactive {
+    background-color: #e17d7d; /* Червоний фон для неактивних */
+}
+
+.date-filter {
+    width: 90%;
+    padding: 20px;
+    font-size: 1em;
+    border: 1px black solid;
+    border-radius: 5px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+.date-filter label {
+    font-weight: bold;
+}
+.date-filter input,
+.date-filter button {
+    padding: 5px;
+    font-size: 1em;
+}
+
+.date-filter-and-button{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+}
+/*tr:nth-child(even) {*/
+/*    background-color: #f2f2f2;*/
+/*}*/
+
+.authForm{
+    max-width: 300px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+}

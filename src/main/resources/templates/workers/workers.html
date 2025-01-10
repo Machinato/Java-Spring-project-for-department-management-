@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="logo">Company Management</h1>
+        <nav class="nav-bar">
+            <a href="/departments" class="nav-link">All Departments</a>
+            <a href="/workers" class="nav-link">All Workers</a>
+            <a href="/send-report" class="nav-link">Get report</a>
+            <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/users}" method="GET"> <button accesskey="d"> All users </button></form>
+            <form th:action="@{/logout}" method="POST"> <button accesskey="d"> LOGOUT </button></form>
+        </nav>
+    </div>
+</header>
+<h1>Workers: <span th:text="${department != null ? department.nameDep : 'AllWorkers'}"></span></h1>
+
+<!-- Пошук -->
+<label for="searchInput">Search by Last Name:</label>
+<input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for workers...">
+
+<!-- Фільтр -->
+<label for="roleFilter">Filter by worker status :</label>
+<select id="roleFilter" onchange="filterByWorkerStatus()">
+    <option value="all">All</option>
+    <option value="employed">Employed</option>
+    <option value="non-employed">Non-employed</option>
+    <!-- Додайте інші ролі за потреби -->
+</select>
+<!-- Фільтрація за датами -->
+<div class="date-filter">
+    <div class="date-filter-and-button">
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate">
+
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" value="">
+    </div>
+
+    <button onclick="filterByDate()">Apply Date Filter</button>
+    <label for="departmentFilter">Filter by Department:</label>
+    <select id="departmentFilter" onchange="filterByDepartment()">
+        <option value="all">All</option>
+        <option th:each="department : ${departments}" th:value="${department.nameDep}" th:text="${department.nameDep}"></option>
+    </select>
+    <button onclick="resetFilters()">Reset Filters</button>
+</div>
+
+
+<form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/worker/new}" method="GET">
+    <input type="submit" value="NEW WORKER">
+</form>
+<form th:action="@{/workers}" method="GET">
+    <input type="submit" value="ALL WORKERS">
+</form>
+
+<!-- Таблиця -->
+<table id="workersTable" border="1" data-sort-order="asc">
+    <thead>
+    <tr>
+        <th onclick="sortTable(0)">Code</th>
+        <th onclick="sortTable(1)">First Name</th>
+        <th onclick="sortTable(2)">Last Name</th>
+<!--        <th onclick="sortTable(3)">Role</th>-->
+        <th onclick="sortTable(3)">Start Date</th>
+        <th onclick="sortTable(4)">End Date</th>
+        <th onclick="sortTable(5)">Department name</th>
+        <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}"></th>
+        <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:classappend="${!worker.active} ? 'inactive' : ''" th:each="worker : ${workers}">
+<!--        <td th:text="${worker.id}"></td>-->
+        <td th:text="${worker.code}"></td>
+        <td th:text="${worker.nameFirst}"></td>
+        <td th:text="${worker.nameSecond}"></td>
+        <td th:text="${worker.startWork}"></td>
+        <td th:text="${worker.endWork != null ? worker.endWork : 'Працює'}"></td>
+        <td onclick="" th:text="${worker.department != null ? worker.department.nameDep : ''}"></td>
+        <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <form th:action="@{/worker/edit/{id} (id=${worker.id})}" method="GET">
+                <input type="submit" value="UPDATE"/>
+            </form>
+        </td>
+        <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <form th:action="@{/workers/delete/{id} (id=${worker.id})}" method="GET">
+                <input type="submit" value="DELETE" onclick="return confirm('Are you sure you want to delete this worker?')" />
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+<script>
+    // Функція для пошуку
+    function searchTable() {
+        let input = document.getElementById('searchInput');
+        let filter = input.value.toLowerCase();
+        let table = document.getElementById('workersTable');
+        let rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            let match = false;
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[2].textContent.toLowerCase().indexOf(filter) > -1) {
+                    match = true;
+                    break;
+                }
+            }
+            rows[i].style.display = match ? '' : 'none';
+        }
+    }
+
+    function resetFilters() {
+        // Очистити пошуковий інпут
+        document.getElementById('searchInput').value = '';
+
+        // Скинути вибір фільтра за статусом працівника
+        document.getElementById('roleFilter').value = 'all';
+
+        // Очистити поля вибору дат
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+
+        // Показати всі рядки
+        let table = document.getElementById('workersTable');
+        let rows = table.getElementsByTagName('tr');
+        for (let i = 1; i < rows.length; i++) {
+            rows[i].style.display = '';
+        }
+    }
+
+    // Функція для сортування
+    function sortTable(columnIndex) {
+        let table = document.getElementById('workersTable');
+        let rows = Array.from(table.rows).slice(1);
+        let isAscending = table.getAttribute('data-sort-order') === 'asc';
+
+        rows.sort((rowA, rowB) => {
+            let cellA = rowA.cells[columnIndex].textContent.trim().toLowerCase();
+            let cellB = rowB.cells[columnIndex].textContent.trim().toLowerCase();
+
+            if (cellA < cellB) return isAscending ? -1 : 1;
+            if (cellA > cellB) return isAscending ? 1 : -1;
+            return 0;
+        });
+
+        table.tBodies[0].append(...rows);
+        table.setAttribute('data-sort-order', isAscending ? 'desc' : 'asc');
+    }
+
+    // Фільтрація за роллю (або іншими полями)
+    function filterByWorkerStatus() {
+        let select = document.getElementById('roleFilter');
+        let filter = select.value.toLowerCase();
+        let table = document.getElementById('workersTable');
+        let rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            let cell = rows[i].cells[4];
+            if (filter === 'all' || (cell.textContent.toLowerCase() === "працює" && filter === 'employed') || (cell.textContent.toLowerCase() !== "працює" && filter === 'non-employed')) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+
+    function filterByDate() {
+        const startDateInput = document.getElementById('startDate').value;
+        const endDateInput = document.getElementById('endDate').value;
+        const table = document.getElementById('workersTable');
+        const rows = table.getElementsByTagName('tr');
+
+        console.log("startDateInput && endDateInput", startDateInput, endDateInput );
+
+        // Якщо обидві дати не встановлено, показати всі рядки
+        if (!startDateInput && !endDateInput) {
+            console.log("!startDateInput && !endDateInput", startDateInput, endDateInput );
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+            return;
+        }
+
+        const startDate = startDateInput ? new Date(startDateInput) : null;
+        const endDate = endDateInput ? new Date(endDateInput) : new Date();
+        // new Date().toISOString().split('T')[0]
+
+        for (let i = 1; i < rows.length; i++) {
+            const startDateCell = rows[i].cells[3].textContent.trim(); // Start Date у 4-й колонці
+            const endDateCell = rows[i].cells[4].textContent.trim() === 'Працює' ? new Date() : rows[i].cells[4].textContent.trim();   // End Date у 5-й колонці
+
+            // Перетворити дати в клітинках
+            const rowStartDate = new Date(startDateCell);
+            const rowEndDate =new Date(endDateCell);
+
+            console.log("rowStartDate", rowStartDate);
+            console.log("rowEndDate", rowEndDate);
+            console.log("startDate", startDate);
+            console.log("endDate", endDate);
+
+            // Перевірити валідність дат
+            const matchesStart = !startDate || rowStartDate >= startDate;
+            const matchesEnd = isNaN(rowEndDate.getTime()) || rowEndDate <= endDate;
+            console.log("matchesStart", matchesStart);
+            console.log("matchesEnd", matchesEnd);
+
+            // Встановити відображення рядка
+            rows[i].style.display = (matchesStart && matchesEnd) ? '' : 'none';
+        }
+    }
+
+    function filterByDepartment() {
+        const select = document.getElementById('departmentFilter');
+        const filter = select.value.toLowerCase();
+        const table = document.getElementById('workersTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const departmentCell = rows[i].cells[5]; // Колонка з назвою департаменту
+            if (filter === 'all' || departmentCell.textContent.toLowerCase() === filter) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+
+
+</script>
+</html>

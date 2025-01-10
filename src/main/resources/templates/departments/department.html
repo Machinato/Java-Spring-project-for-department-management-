@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}"></title>
+    <script src="https://unpkg.com/imask"></script>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="logo">Company Management</h1>
+        <nav class="nav-bar">
+            <a href="/departments" class="nav-link">All Departments</a>
+            <a href="/workers" class="nav-link">All Workers</a>
+            <a href="/send-report" class="nav-link">Get report</a>
+            <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{/users}" method="GET"> <button accesskey="d"> All users </button></form>
+            <form th:action="@{/logout}" method="POST"> <button accesskey="d"> LOGOUT </button></form>
+        </nav>
+    </div>
+</header>
+<div class="content">
+    <caption>
+        <h1 th:text="${title} + ' - (HBN Proc Java 24)'"></h1>
+    </caption>
+
+    <div th:if="${#strings.length(errMessage) > 0}">
+        <p style="color: red"><b th:text="${errMessage}"></b></p>
+    </div>
+
+    <form th:action="@{${department.id == 0} ? '/department/save' : '/department/save/'+ ${department.id}}"
+          th:object="${department}" method="POST">
+        <input type="hidden" name="idDep" id="idDep" th:value="${department.id}" required>
+
+        <p>
+            <label for="nameDep">Department name</label>
+            <input type="text" name="nameDep" id="nameDep" th:value="${department.nameDep}"
+                   pattern="^([A-Z][a-z]+)(\s[A-Z][a-z]+)*$"
+                   oninput="generateAbbreviation()"
+                   required>
+        </p>
+
+        <p>
+            <label for="nameSDep">Department short name</label>
+            <input type="text" name="nameSDep" id="nameSDep" th:value="${department.nameSDep}"
+                   pattern="^[A-Z]{1,8}$" required>
+        </p>
+
+        <p>
+            <label for="codeDep">Email address</label>
+            <input type="text" name="codeDep" id="codeDep" th:value="${department.codeDep}"
+                   pattern="^[0-9]{3}$" required>
+        </p>
+
+        <p>
+            <label for="emailHead">Email address</label>
+            <input type="email" name="emailHead" id="emailHead" th:value="${department.emailHead}" required>
+        </p>
+
+        <p>
+            <label for="phoneHead">Phone number</label>
+            <input type="tel" name="phoneHead" id="phoneHead" th:value="${department.phoneHead}"
+                   pattern="[\+]\d{2}\s[\(]\d{3}[\)]\s\d{3}[\-]\d{2}[\-]\d{2}"
+                   oninput="formatPhoneNumber(this)" minlength="19" maxlength="19" required>
+        </p>
+
+        <p>
+            <button type="submit">SAVE</button>
+            <a th:href="@{/departments}">Cancel</a>
+        </p>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var shortNameBefore;
+    var onlyPhoneNumber;
+
+    function generateAbbreviation() {
+        // Получаем значения полей
+        const nameDep = document.getElementById("nameDep").value;
+        const nameSDep = document.getElementById("nameSDep");
+
+        // Разделяем название департамента на слова и берем первые буквы
+        const abbreviation = nameDep
+            .split(' ') // Разбиваем строку по пробелам
+            .map(word => word.charAt(0).toUpperCase()) // Берем первую букву каждого слова
+            .join(''); // Соединяем буквы в строку
+        console.log(abbreviation);
+        console.log("nameSDep.value === \"NEW DEPARTMENT\"", nameSDep.value === "NEW DEPARTMENT");
+        // Проверяем, если поле аббревиатуры пустое
+        if (nameSDep.value.trim() === shortNameBefore || nameSDep.value.trim() === "NEW DEPARTMENT") {
+            shortNameBefore = abbreviation;
+            // Заполняем поле с аббревиатурой
+            nameSDep.value = abbreviation;
+        }
+    }
+</script>
+<script>
+    // Настройка маски для телефона
+    var phoneInput = document.getElementById('phoneHead');
+    var phoneMask = IMask(phoneInput, {
+        mask: '+{38} (000) 000-00-00' // Пример маски для телефона
+    });
+</script>
+</body>
+</html>

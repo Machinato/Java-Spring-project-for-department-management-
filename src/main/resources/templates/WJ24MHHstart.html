@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Java 24 - Hello, HBN!!!</title>
+    <link th:href="@{/style/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="login">
+    <h1>Max Hritsenko Variant №5</h1>
+    <h2 sec:authorize="isAuthenticated()">LOG IN: <span sec:authentication="name"></span>
+        (<span sec:authentication="principal.authorities"></span>)
+    </h2>
+<!--    <h3 sec:authorize="isAuthenticated()">Email: <span sec:authentication="email"></span>-->
+<!--        (<span sec:authentication="principal.authorities"></span>)</h3>-->
+    <!--            Button LOGOUT      -->
+    <!-- Important!!!! Mandatory method POST!!!! -->
+    <form th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()">
+        <button accesskey="d"> LOGOUT </button>
+    </form>
+    <form action="departments" method="get">
+        <!-- Display error message if it exists -->
+        <div th:if="${not #strings.isEmpty(errorMessage)}" class="error">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <button type="submit">Show All Departments</button>
+    </form>
+
+    <br/><br/><br/>
+
+    <!-- Format the current date and time -->
+    <h2>Today is <span th:text="${#dates.format(#dates.createNow(),'dd.MMM.yyyy')}"></span></h2>
+    <h2><span th:text="${#dates.format(#dates.createNow(), 'EEEE')}"></span></h2>
+</div>
+</body>
+</html>
